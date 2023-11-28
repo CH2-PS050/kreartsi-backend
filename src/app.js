@@ -1,19 +1,27 @@
-const express = require('express');
-const cors = require('cors');
+import express from 'express';
+import cors from 'cors';
+import { router } from './routes/routes.js'
 
 const app = express();
 
-var corsOptions = {
-    origin: '*',
-    credentials:true,
-    optionsSuccessStatus: 200
+const corsOptions = {
+  origin: '*',
+  credentials: true,
+  optionsSuccessStatus: 200,
 };
+
+const port = 3000;
 
 app.use(express.json());
 app.use(cors(corsOptions));
 
-app.get('/', (req, res) => {
-    res.send('Hello, Express!');
-  });
+app.listen(port, () => {
+  console.log(`⚡️[server]: Server is running at http://localhost:${port}`);
+});
 
-module.exports = app
+app.get('/', (req, res) => {
+  res.send('Hello, Express!');
+});
+
+app.use('/api/v1', router);
+
