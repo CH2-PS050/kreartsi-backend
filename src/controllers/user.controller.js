@@ -3,6 +3,7 @@ const { generateToken } = require('../helpers/jwt');
 const pool = require('../database');
 
 // sebenarnya will be better kalo pake sequelize ORM tp error wkt aku coba jd sementara query" gini aja dulu
+// Get All Users
 exports.getUsers = async (req, res) => {
   try {
 
@@ -12,6 +13,29 @@ exports.getUsers = async (req, res) => {
         res.status(500).send('Internal Server Error');
       } else {
         res.json(results);
+      }
+    }
+    );
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+// Get User by ID
+exports.getUserById = async (req, res) => {
+  try {
+    const { user_id } = req.params;
+
+    pool.query('SELECT * FROM Users WHERE user_id = ?', [user_id], (error, results) => {
+      if (error) {
+        console.error(error);
+        res.status(500).send('Internal Server Error');
+      } else {
+        if (results.length === 0) {
+          return res.status(400).json({ msg: 'User not found' });
+        } else {
+          res.status(200).json(results);
+        }
       }
     }
     );
