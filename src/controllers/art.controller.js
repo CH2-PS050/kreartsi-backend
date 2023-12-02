@@ -121,3 +121,41 @@ exports.donation = async (req, res) => {
     console.log(error);
   }
 }
+
+// Like Art 
+exports.likeArt = async (req, res) => {
+  try {
+    const { artwork_id } = req.params;
+
+    const likeArtQuery = 'UPDATE Artworks SET likes_count = likes_count + 1 WHERE artwork_id = ?';
+    pool.query(likeArtQuery, [artwork_id], (error, results) => {
+      if (error) {
+        console.error(error);
+        return res.status(500).send('Internal Server Error');
+      } else {
+        res.status(200).json({ msg: "Artwork liked" })
+      }
+    });
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+// Unlike 
+exports.unlikeArt = async (req, res) => {
+  try {
+    const { artwork_id } = req.params;
+
+    const unlikeArtQuery = 'UPDATE Artworks SET likes_count = likes_count - 1 WHERE artwork_id = ?';
+    pool.query(unlikeArtQuery, [artwork_id], (error, results) => {
+      if (error) {
+        console.error(error);
+        return res.status(500).send('Internal Server Error');
+      } else {
+        res.status(200).json({ msg: "Artwork unliked" })
+      }
+    });
+  } catch (error) {
+    console.log(error);
+  }
+}
