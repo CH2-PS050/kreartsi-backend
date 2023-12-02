@@ -35,6 +35,27 @@ exports.getMyArts = async (req, res) => {
   }
 };
 
+// Get Art by ID
+exports.getArtById = async (req, res) => {
+  try {
+    const { artwork_id } = req.params;
+
+    pool.query('SELECT * FROM Artworks WHERE artwork_id = ?', [artwork_id], (error, results) => {
+      if (error) {
+        console.error(error);
+        res.status(500).send('Internal Server Error');
+      } else {
+        if (results.length === 0) {
+          return res.status(400).json({ msg: 'Artwork not found' });
+        } else {
+          res.status(200).json(results);
+        }
+      }
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};
 
 // Upload Art
 exports.uploadArt = async (req, res) => {
