@@ -11,6 +11,7 @@ import {
   saveArt,
   unsaveArt,
   deleteArt,
+  editArtCaption,
 } from "../controllers/art.controller";
 
 const router = Router();
@@ -21,6 +22,7 @@ router.get("/:artwork_id", getArtById);
 
 router.post("/upload", uploadArt);
 router.delete("/:artworkId", deleteArt);
+router.put("/caption/:artworkId", editArtCaption);
 
 router.post("/like/:artwork_id", likeArt);
 router.post("/unlike/:artwork_id", unlikeArt);

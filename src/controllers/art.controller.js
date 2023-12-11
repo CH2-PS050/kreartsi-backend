@@ -316,3 +316,43 @@ exports.deleteArt = async (req, res) => {
     }
   );
 };
+
+exports.editArtCaption = async (req, res) => {
+  const { artworkId } = req.params;
+  const { caption } = req.body;
+  const userId = res.locals.user.user_id;
+
+  const checkArtworkQuery =
+    "SELECT * FROM Artworks WHERE user_id = ? AND artwork_id = ?";
+  pool.query(
+    checkArtworkQuery,
+    [userId, artworkId],
+    (checkError, checkResults) => {
+      if (checkError) {
+        console.error(checkError);
+        return res.status(500).send("Internal Server Error");
+      }
+
+      if (checkResults.length === 0) {
+        return res
+          .status(404)
+          .json({ msg: "Artwork not found for the specified user." });
+      }
+
+      const updateCaptionQuery =
+        "UPDATE Artworks SET caption = ? WHERE user_id = ? AND artwork_id = ?";
+      pool.query(
+        updateCaptionQuery,
+        [caption, userId, artworkId],
+        (updateError) => {
+          if (updateError) {
+            console.error(updateError);
+            return res.status(500).send("Internal Server Error");
+          }
+
+          res.status(200).json({ msg: "Caption updated successfully." });
+        }
+      );
+    }
+  );
+};
