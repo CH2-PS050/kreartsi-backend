@@ -166,7 +166,6 @@ exports.likeArt = async (req, res) => {
   });
 };
 
-// Unlike
 exports.unlikeArt = async (req, res) => {
   const { artwork_id } = req.params;
 
@@ -181,3 +180,103 @@ exports.unlikeArt = async (req, res) => {
     }
   });
 };
+
+exports.getDonationHistory = async (req, res) => {};
+
+exports.saveArt = async (req, res) => {
+  const { artworkId } = req.params;
+  const userId = res.locals.user.user_id;
+
+  const checkSavedArtworkQuery =
+    "SELECT * FROM SavedArtworks WHERE user_id = ? AND artwork_id = ?";
+  pool.query(
+    checkSavedArtworkQuery,
+    [userId, artworkId],
+    (checkError, checkResults) => {
+      if (checkError) {
+        console.error(checkError);
+        return res.status(500).send("Internal Server Error");
+      }
+
+      if (checkResults.length > 0) {
+        return res
+          .status(400)
+          .json({ msg: "Artwork already saved by the user." });
+      }
+
+      const checkArtworkQuery = "SELECT * FROM Artworks WHERE artwork_id = ?";
+      pool.query(checkArtworkQuery, [artworkId], (error, results) => {
+        if (error) {
+          console.error(error);
+          return res.status(500).send("Internal Server Error");
+        }
+
+        if (results.length === 0) {
+          return res.status(404).json({ msg: "Artwork not found." });
+        }
+
+        const saveArtworkQuery =
+          "INSERT INTO SavedArtworks (user_id, artwork_id) VALUES (?, ?)";
+        pool.query(saveArtworkQuery, [userId, artworkId], (saveError) => {
+          if (saveError) {
+            return res.status(500).send("Internal Server Error");
+          }
+
+          res.status(200).json({ msg: "Artwork saved successfully." });
+        });
+      });
+    }
+  );
+};
+
+exports.unsaveArt = async (req, res) => {
+  const { artworkId } = req.params;
+  const userId = res.locals.user.user_id;
+
+  const checkSavedArtworkQuery =
+    "SELECT * FROM SavedArtworks WHERE user_id = ? AND artwork_id = ?";
+  pool.query(
+    checkSavedArtworkQuery,
+    [userId, artworkId],
+    (checkError, checkResults) => {
+      if (checkError) {
+        console.error(checkError);
+        return res.status(500).send("Internal Server Error");
+      }
+
+      if (checkResults.length === 0) {
+        return res.status(404).json({ msg: "Artwork not saved by the user." });
+      }
+
+      const checkArtworkQuery = "SELECT * FROM Artworks WHERE artwork_id = ?";
+      pool.query(
+        checkArtworkQuery,
+        [artworkId],
+        (artworkError, artworkResults) => {
+          if (artworkError) {
+            console.error(artworkError);
+            return res.status(500).send("Internal Server Error");
+          }
+
+          if (artworkResults.length === 0) {
+            return res.status(404).json({ msg: "Artwork not found." });
+          }
+
+          // Remove the saved artwork association for the user
+          const unsaveArtworkQuery =
+            "DELETE FROM SavedArtworks WHERE user_id = ? AND artwork_id = ?";
+          pool.query(unsaveArtworkQuery, [userId, artworkId], (unsaveError) => {
+            if (unsaveError) {
+              console.error(unsaveError);
+              return res.status(500).send("Internal Server Error");
+            }
+
+            res.status(200).json({ msg: "Artwork un-saved successfully." });
+          });
+        }
+      );
+    }
+  );
+};
+
+exports.deleteArt = async (req, res) => {};

@@ -1,14 +1,34 @@
 import { Router } from "express";
-import { getArts, getMyArts, getArtById, likeArt, unlikeArt, uploadArt, donation } from "../controllers/art.controller";
+import {
+  getArts,
+  getMyArts,
+  getArtById,
+  likeArt,
+  unlikeArt,
+  uploadArt,
+  donation,
+  getDonationHistory,
+  saveArt,
+  unsaveArt,
+  deleteArt,
+} from "../controllers/art.controller";
 
 const router = Router();
 
 router.get("/", getArts);
-router.post("/upload", uploadArt);
 router.get("/myarts", getMyArts);
+router.get("/:artwork_id", getArtById);
+
+router.post("/upload", uploadArt);
+router.delete("/:artwork_id", deleteArt);
+
 router.post("/like/:artwork_id", likeArt);
 router.post("/unlike/:artwork_id", unlikeArt);
+
+router.post("/save/:artworkId", saveArt);
+router.delete("/unsave/:artworkId", unsaveArt);
+
 router.post("/donate/:user_id", donation); // user_id = recipient_user_id (yg nerima koin)
-router.get("/:artwork_id", getArtById);
+router.get("/donate/history", getDonationHistory);
 
 export { router as artRouter };
