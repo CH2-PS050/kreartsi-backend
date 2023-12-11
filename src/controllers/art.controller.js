@@ -262,7 +262,6 @@ exports.unsaveArt = async (req, res) => {
             return res.status(404).json({ msg: "Artwork not found." });
           }
 
-          // Remove the saved artwork association for the user
           const unsaveArtworkQuery =
             "DELETE FROM SavedArtworks WHERE user_id = ? AND artwork_id = ?";
           pool.query(unsaveArtworkQuery, [userId, artworkId], (unsaveError) => {
@@ -279,4 +278,41 @@ exports.unsaveArt = async (req, res) => {
   );
 };
 
-exports.deleteArt = async (req, res) => {};
+exports.deleteArt = async (req, res) => {
+  const { artworkId } = req.params;
+  const userId = res.locals.user.user_id;
+  console.log(userId);
+  console.log(artworkId);
+  const checkArtworkQuery =
+    "SELECT * FROM Artworks WHERE user_id = ? AND artwork_id = ?";
+  console.log(checkArtworkQuery);
+  pool.query(
+    checkArtworkQuery,
+    [userId, artworkId],
+    (checkError, checkResults) => {
+      if (checkError) {
+        console.error(checkError);
+        return res.status(500).send("Internal Server Error");
+      }
+
+      console.log(checkResults);
+
+      if (checkResults.length === 0) {
+        return res
+          .status(404)
+          .json({ msg: "Artwork not found for the specified user." });
+      }
+
+      const deleteArtworkQuery =
+        "DELETE FROM Artworks WHERE user_id = ? AND artwork_id = ?";
+      pool.query(deleteArtworkQuery, [userId, artworkId], (deleteError) => {
+        if (deleteError) {
+          console.error(deleteError);
+          return res.status(500).send("Internal Server Error");
+        }
+
+        res.status(200).json({ msg: "Artwork deleted successfully." });
+      });
+    }
+  );
+};

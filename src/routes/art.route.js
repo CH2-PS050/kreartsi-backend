@@ -20,7 +20,7 @@ router.get("/myarts", getMyArts);
 router.get("/:artwork_id", getArtById);
 
 router.post("/upload", uploadArt);
-router.delete("/:artwork_id", deleteArt);
+router.delete("/:artworkId", deleteArt);
 
 router.post("/like/:artwork_id", likeArt);
 router.post("/unlike/:artwork_id", unlikeArt);
