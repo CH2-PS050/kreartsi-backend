@@ -30,6 +30,27 @@ exports.getMyArts = async (req, res) => {
   );
 };
 
+// Get My SavedArts
+exports.getMySavedArts = async (req, res) => {
+  const userId = res.locals.user.user_id;
+
+  const getSavedArtworksQuery = `
+    SELECT Artworks.*
+    FROM Artworks
+    INNER JOIN SavedArtworks ON Artworks.artwork_id = SavedArtworks.artwork_id
+    WHERE SavedArtworks.user_id = ?;
+  `;
+
+  pool.query(getSavedArtworksQuery, [userId], (error, results) => {
+    if (error) {
+      console.error(error);
+      res.status(500).send("Internal Server Error");
+    } else {
+      res.status(200).json(results);
+    }
+  });
+};
+
 // Get Art by ID
 exports.getArtById = async (req, res) => {
   const { artwork_id } = req.params;

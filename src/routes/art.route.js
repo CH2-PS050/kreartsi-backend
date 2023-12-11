@@ -12,12 +12,14 @@ import {
   unsaveArt,
   deleteArt,
   editArtCaption,
+  getMySavedArts,
 } from "../controllers/art.controller";
 
 const router = Router();
 
 router.get("/", getArts);
 router.get("/myarts", getMyArts);
+router.get("/my-saved-arts", getMySavedArts);
 router.get("/:artwork_id", getArtById);
 
 router.post("/upload", uploadArt);
