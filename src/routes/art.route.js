@@ -18,21 +18,21 @@ import {
 const router = Router();
 
 router.get("/", getArts);
-router.get("/myarts", getMyArts);
+router.get("/my-arts", getMyArts);
 router.get("/my-saved-arts", getMySavedArts);
-router.get("/:artwork_id", getArtById);
+router.get("/:artworkId", getArtById);
 
 router.post("/upload", uploadArt);
 router.delete("/:artworkId", deleteArt);
 router.put("/caption/:artworkId", editArtCaption);
 
-router.post("/like/:artwork_id", likeArt);
-router.post("/unlike/:artwork_id", unlikeArt);
+router.post("/like/:artworkId", likeArt);
+router.post("/unlike/:artworkId", unlikeArt);
 
 router.post("/save/:artworkId", saveArt);
 router.delete("/unsave/:artworkId", unsaveArt);
 
-router.post("/donate/:user_id", donation); // user_id = recipient_user_id (yg nerima koin)
+router.post("/donate/:userId", donation); // user_id = recipient_user_id (yg nerima koin)
 router.get("/donate/history", getDonationHistory);
 
 export { router as artRouter };

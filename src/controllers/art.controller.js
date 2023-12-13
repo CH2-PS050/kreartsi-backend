@@ -14,11 +14,11 @@ exports.getArts = async (req, res) => {
 
 // Get My Arts
 exports.getMyArts = async (req, res) => {
-  const user_id = res.locals.user.user_id;
+  const userId = res.locals.user.user_id;
 
   pool.query(
     "SELECT * FROM Artworks WHERE user_id = ?",
-    [user_id],
+    [userId],
     (error, results) => {
       if (error) {
         console.error(error);
@@ -53,11 +53,11 @@ exports.getMySavedArts = async (req, res) => {
 
 // Get Art by ID
 exports.getArtById = async (req, res) => {
-  const { artwork_id } = req.params;
+  const { artworkId } = req.params;
 
   pool.query(
     "SELECT * FROM Artworks WHERE artwork_id = ?",
-    [artwork_id],
+    [artworkId],
     (error, results) => {
       if (error) {
         console.error(error);
@@ -75,10 +75,10 @@ exports.getArtById = async (req, res) => {
 
 // Upload Art
 exports.uploadArt = async (req, res) => {
-  const { caption, image_url, category_id } = req.body;
-  const user_id = res.locals.user.user_id;
+  const { caption, imageUrl, categoryId } = req.body;
+  const userId = res.locals.user.user_id;
 
-  if (!caption || !image_url || !category_id) {
+  if (!caption || !imageUrl || !categoryId) {
     return res.status(400).json({ message: "Please enter all fields" });
   }
 
@@ -87,7 +87,7 @@ exports.uploadArt = async (req, res) => {
     "INSERT INTO Artworks (caption, image_url, category_id, user_id) VALUES (?, ?, ?, ?)";
   pool.query(
     newArtQuery,
-    [caption, image_url, category_id, user_id],
+    [caption, imageUrl, categoryId, userId],
     (error, results) => {
       if (error) {
         console.error(error);
@@ -96,9 +96,9 @@ exports.uploadArt = async (req, res) => {
         let response = {
           id: results.insertId,
           caption: caption,
-          image_url: image_url,
-          category_id: category_id,
-          user_id: user_id,
+          imageUrl: imageUrl,
+          categoryId: categoryId,
+          userId: userId,
         };
         res
           .status(200)
@@ -110,9 +110,9 @@ exports.uploadArt = async (req, res) => {
 
 // DONATE
 exports.donation = async (req, res) => {
-  const { donated_amount } = req.body;
-  const recipient_user_id = req.params.user_id;
-  const donor_user_id = res.locals.user.user_id;
+  const { donatedAmount } = req.body;
+  const recipientUserId = req.params.userId;
+  const donorUserId = res.locals.user.user_id;
 
   if (!donated_amount) {
     return res.status(400).json({ message: "Please input the amount" });
@@ -122,7 +122,7 @@ exports.donation = async (req, res) => {
     "INSERT INTO Donations (donated_amount, donor_user_id, recipient_user_id) VALUES (?, ?, ?)";
   pool.query(
     newDonationQuery,
-    [donated_amount, donor_user_id, recipient_user_id],
+    [donatedAmount, donorUserId, recipientUserId],
     (error, results) => {
       if (error) {
         console.error(error);
@@ -134,7 +134,7 @@ exports.donation = async (req, res) => {
             "UPDATE Users SET coins = coins + ? WHERE user_id = ?";
           pool.query(
             updateRecipientCoinQuery,
-            [donated_amount, recipient_user_id],
+            [donatedAmount, recipientUserId],
             (error, results) => {
               if (error) {
                 console.error(error);
@@ -147,7 +147,7 @@ exports.donation = async (req, res) => {
             "UPDATE Users SET coins = coins - ? WHERE user_id = ?";
           pool.query(
             updateDonorCoinQuery,
-            [donated_amount, donor_user_id],
+            [donatedAmount, donorUserId],
             (error, results) => {
               if (error) {
                 console.error(error);
@@ -158,9 +158,9 @@ exports.donation = async (req, res) => {
 
           let response = {
             id: results.insertId,
-            donated_amount: donated_amount,
-            donor_user_id: donor_user_id,
-            recipient_user_id: recipient_user_id,
+            donatedAmount: donatedAmount,
+            donorUserId: donorUserId,
+            recipientUserId: recipientUserId,
           };
           res
             .status(200)
@@ -175,11 +175,11 @@ exports.donation = async (req, res) => {
 
 // Like Art
 exports.likeArt = async (req, res) => {
-  const { artwork_id } = req.params;
+  const { artworkId } = req.params;
 
   const likeArtQuery =
     "UPDATE Artworks SET likes_count = likes_count + 1 WHERE artwork_id = ?";
-  pool.query(likeArtQuery, [artwork_id], (error, results) => {
+  pool.query(likeArtQuery, [artworkId], (error, results) => {
     if (error) {
       console.error(error);
       return res.status(500).send("Internal Server Error");
@@ -190,11 +190,11 @@ exports.likeArt = async (req, res) => {
 };
 
 exports.unlikeArt = async (req, res) => {
-  const { artwork_id } = req.params;
+  const { artworkId } = req.params;
 
   const unlikeArtQuery =
     "UPDATE Artworks SET likes_count = likes_count - 1 WHERE artwork_id = ?";
-  pool.query(unlikeArtQuery, [artwork_id], (error, results) => {
+  pool.query(unlikeArtQuery, [artworkId], (error, results) => {
     if (error) {
       console.error(error);
       return res.status(500).send("Internal Server Error");
@@ -306,8 +306,7 @@ exports.unsaveArt = async (req, res) => {
 exports.deleteArt = async (req, res) => {
   const { artworkId } = req.params;
   const userId = res.locals.user.user_id;
-  console.log(userId);
-  console.log(artworkId);
+
   const checkArtworkQuery =
     "SELECT * FROM Artworks WHERE user_id = ? AND artwork_id = ?";
   console.log(checkArtworkQuery);

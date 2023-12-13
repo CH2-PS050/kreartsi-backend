@@ -13,6 +13,6 @@ router.use(authentication);
 router.get("/", getUsers);
 router.post("/register", registerUser);
 router.post("/login", loginUser);
-router.get("/:user_id", getUserById);
+router.get("/:userId", getUserById);
 
 export { router as userRouter };

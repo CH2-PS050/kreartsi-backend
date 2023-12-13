@@ -17,11 +17,11 @@ exports.getUsers = async (req, res) => {
 
 // Get User by ID
 exports.getUserById = async (req, res) => {
-  const { user_id } = req.params;
+  const { userId } = req.params;
 
   pool.query(
     "SELECT * FROM Users WHERE user_id = ?",
-    [user_id],
+    [userId],
     (error, results) => {
       if (error) {
         console.error(error);
