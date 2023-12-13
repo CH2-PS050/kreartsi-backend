@@ -28,7 +28,7 @@ exports.getUserById = async (req, res) => {
         res.status(500).send("Internal Server Error");
       } else {
         if (results.length === 0) {
-          return res.status(400).json({ msg: "User not found" });
+          return res.status(400).json({ message: "User not found" });
         } else {
           res.status(200).json(results);
         }
@@ -43,14 +43,14 @@ exports.registerUser = async (req, res) => {
 
   console.log(username, email, password);
   if (!username || !email || !password) {
-    return res.status(400).json({ msg: "Please enter all fields" });
+    return res.status(400).json({ message: "Please enter all fields" });
   }
 
   const existingUserQuery = "SELECT * FROM Users WHERE email = ?";
   pool.query(existingUserQuery, [email], (error, results) => {
     console.log(results);
     if (results.length > 0) {
-      return res.status(400).json({ msg: "User already exists" });
+      return res.status(400).json({ message: "User already exists" });
     } else if (error) {
       console.error(error);
       return res.status(500).send("Internal Server Error");
@@ -73,7 +73,7 @@ exports.registerUser = async (req, res) => {
           };
           return res
             .status(200)
-            .json({ msg: "User registered successfully", user: response });
+            .json({ message: "User registered successfully", user: response });
         }
       }
     );
@@ -85,7 +85,7 @@ exports.loginUser = async (req, res) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
-    return res.status(400).json({ msg: "Please enter all fields" });
+    return res.status(400).json({ message: "Please enter all fields" });
   }
 
   pool.query(
@@ -97,11 +97,11 @@ exports.loginUser = async (req, res) => {
         res.status(500).send("Internal Server Error");
       } else {
         if (results.length === 0) {
-          return res.status(400).json({ msg: "User does not exists" });
+          return res.status(400).json({ message: "User does not exists" });
         }
         const isMatch = comparePassword(password, results[0].password);
         if (!isMatch)
-          return res.status(400).json({ msg: "Invalid credentials" });
+          return res.status(400).json({ message: "Invalid credentials" });
 
         let payload = {
           id: results[0].id,

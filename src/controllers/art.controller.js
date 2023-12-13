@@ -64,7 +64,7 @@ exports.getArtById = async (req, res) => {
         res.status(500).send("Internal Server Error");
       } else {
         if (results.length === 0) {
-          return res.status(400).json({ msg: "Artwork not found" });
+          return res.status(400).json({ message: "Artwork not found" });
         } else {
           res.status(200).json(results);
         }
@@ -79,7 +79,7 @@ exports.uploadArt = async (req, res) => {
   const user_id = res.locals.user.user_id;
 
   if (!caption || !image_url || !category_id) {
-    return res.status(400).json({ msg: "Please enter all fields" });
+    return res.status(400).json({ message: "Please enter all fields" });
   }
 
   // PANGGIL MODEL ML BUAT DETECT CATEGORY
@@ -102,7 +102,7 @@ exports.uploadArt = async (req, res) => {
         };
         res
           .status(200)
-          .json({ msg: "Artwork uploaded successfully", art: response });
+          .json({ message: "Artwork uploaded successfully", art: response });
       }
     }
   );
@@ -115,7 +115,7 @@ exports.donation = async (req, res) => {
   const donor_user_id = res.locals.user.user_id;
 
   if (!donated_amount) {
-    return res.status(400).json({ msg: "Please input the amount" });
+    return res.status(400).json({ message: "Please input the amount" });
   }
 
   const newDonationQuery =
@@ -162,7 +162,9 @@ exports.donation = async (req, res) => {
             donor_user_id: donor_user_id,
             recipient_user_id: recipient_user_id,
           };
-          res.status(200).json({ msg: "Donation success", donation: response });
+          res
+            .status(200)
+            .json({ message: "Donation success", donation: response });
         } catch (error) {
           console.log(error);
         }
@@ -182,7 +184,7 @@ exports.likeArt = async (req, res) => {
       console.error(error);
       return res.status(500).send("Internal Server Error");
     } else {
-      res.status(200).json({ msg: "Artwork liked" });
+      res.status(200).json({ message: "Artwork liked" });
     }
   });
 };
@@ -197,7 +199,7 @@ exports.unlikeArt = async (req, res) => {
       console.error(error);
       return res.status(500).send("Internal Server Error");
     } else {
-      res.status(200).json({ msg: "Artwork unliked" });
+      res.status(200).json({ message: "Artwork unliked" });
     }
   });
 };
@@ -222,7 +224,7 @@ exports.saveArt = async (req, res) => {
       if (checkResults.length > 0) {
         return res
           .status(400)
-          .json({ msg: "Artwork already saved by the user." });
+          .json({ message: "Artwork already saved by the user." });
       }
 
       const checkArtworkQuery = "SELECT * FROM Artworks WHERE artwork_id = ?";
@@ -233,7 +235,7 @@ exports.saveArt = async (req, res) => {
         }
 
         if (results.length === 0) {
-          return res.status(404).json({ msg: "Artwork not found." });
+          return res.status(404).json({ message: "Artwork not found." });
         }
 
         const saveArtworkQuery =
@@ -243,7 +245,7 @@ exports.saveArt = async (req, res) => {
             return res.status(500).send("Internal Server Error");
           }
 
-          res.status(200).json({ msg: "Artwork saved successfully." });
+          res.status(200).json({ message: "Artwork saved successfully." });
         });
       });
     }
@@ -266,7 +268,9 @@ exports.unsaveArt = async (req, res) => {
       }
 
       if (checkResults.length === 0) {
-        return res.status(404).json({ msg: "Artwork not saved by the user." });
+        return res
+          .status(404)
+          .json({ message: "Artwork not saved by the user." });
       }
 
       const checkArtworkQuery = "SELECT * FROM Artworks WHERE artwork_id = ?";
@@ -280,7 +284,7 @@ exports.unsaveArt = async (req, res) => {
           }
 
           if (artworkResults.length === 0) {
-            return res.status(404).json({ msg: "Artwork not found." });
+            return res.status(404).json({ message: "Artwork not found." });
           }
 
           const unsaveArtworkQuery =
@@ -291,7 +295,7 @@ exports.unsaveArt = async (req, res) => {
               return res.status(500).send("Internal Server Error");
             }
 
-            res.status(200).json({ msg: "Artwork un-saved successfully." });
+            res.status(200).json({ message: "Artwork un-saved successfully." });
           });
         }
       );
@@ -321,7 +325,7 @@ exports.deleteArt = async (req, res) => {
       if (checkResults.length === 0) {
         return res
           .status(404)
-          .json({ msg: "Artwork not found for the specified user." });
+          .json({ message: "Artwork not found for the specified user." });
       }
 
       const deleteArtworkQuery =
@@ -332,7 +336,7 @@ exports.deleteArt = async (req, res) => {
           return res.status(500).send("Internal Server Error");
         }
 
-        res.status(200).json({ msg: "Artwork deleted successfully." });
+        res.status(200).json({ message: "Artwork deleted successfully." });
       });
     }
   );
@@ -357,7 +361,7 @@ exports.editArtCaption = async (req, res) => {
       if (checkResults.length === 0) {
         return res
           .status(404)
-          .json({ msg: "Artwork not found for the specified user." });
+          .json({ message: "Artwork not found for the specified user." });
       }
 
       const updateCaptionQuery =
@@ -371,7 +375,7 @@ exports.editArtCaption = async (req, res) => {
             return res.status(500).send("Internal Server Error");
           }
 
-          res.status(200).json({ msg: "Caption updated successfully." });
+          res.status(200).json({ message: "Caption updated successfully." });
         }
       );
     }
