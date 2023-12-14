@@ -9,10 +9,11 @@ import {
 
 const router = Router();
 
-router.use(authentication);
 router.get("/", getUsers);
 router.post("/register", registerUser);
 router.post("/login", loginUser);
+
+router.use(authentication);
 router.get("/:userId", getUserById);
 
 export { router as userRouter };
