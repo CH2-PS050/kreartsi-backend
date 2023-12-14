@@ -243,7 +243,15 @@ exports.unlikeArt = async (req, res) => {
       console.error(error);
       return res.status(500).send("Internal Server Error");
     } else {
-      res.status(200).json({ message: "Artwork unliked" });
+      const deleteLikedArtQuery = 
+        "DELETE FROM LikedArtworks WHERE artwork_id = ?";
+      pool.query(deleteLikedArtQuery, [artworkId], (unlikeError) => {
+        if (unlikeError) {
+          return res.status(500).send("Internal Server Error");
+        }
+
+        res.status(200).json({ message: "Artwork unliked" });
+      });
     }
   });
 };
