@@ -176,6 +176,7 @@ exports.donation = async (req, res) => {
 // Like Art
 exports.likeArt = async (req, res) => {
   const { artworkId } = req.params;
+  const userId = res.locals.user.user_id;
 
   const likeArtQuery =
     "UPDATE Artworks SET likes_count = likes_count + 1 WHERE artwork_id = ?";
@@ -184,10 +185,38 @@ exports.likeArt = async (req, res) => {
       console.error(error);
       return res.status(500).send("Internal Server Error");
     } else {
-      res.status(200).json({ message: "Artwork liked" });
+      const newLikedArtQuery =
+        "INSERT INTO LikedArtworks (user_id, artwork_id) VALUES (?, ?)";
+      pool.query(newLikedArtQuery, [userId, artworkId], (likeError) => {
+        if (likeError) {
+          return res.status(500).send("Internal Server Error");
+        }
+
+        res.status(200).json({ message: "Artwork liked" });
+      });
     }
   });
 };
+
+exports.isLikedArt = async (req, res) => {
+  const { artworkId } = req.params;
+  const userId = res.locals.user.user_id;
+
+  const checkLikedArtQuery =
+    "SELECT * FROM LikedArtworks WHERE user_id = ? AND artwork_id = ?";
+  pool.query(checkLikedArtQuery, [userId, artworkId], (error, results) => {
+    if (error) {
+      console.error(error);
+      return res.status(500).send("Internal Server Error");
+    } else {
+      if (results.length > 0) {
+        res.status(200).json({ isLiked: true });
+      } else {
+        res.status(200).json({ isLiked: false });
+      }
+    }
+  });
+}
 
 exports.unlikeArt = async (req, res) => {
   const { artworkId } = req.params;
@@ -204,7 +233,46 @@ exports.unlikeArt = async (req, res) => {
   });
 };
 
-exports.getDonationHistory = async (req, res) => {};
+exports.isSavedArt = async (req, res) => {
+  const { artworkId } = req.params;
+  const userId = res.locals.user.user_id;
+
+  const checkSavedArtQuery =
+    "SELECT * FROM SavedArtworks WHERE user_id = ? AND artwork_id = ?";
+  pool.query(checkSavedArtQuery, [userId, artworkId], (error, results) => {
+    if (error) {
+      console.error(error);
+      return res.status(500).send("Internal Server Error");
+    } else {
+      if (results.length > 0) {
+        res.status(200).json({ isSaved: true });
+      } else {
+        res.status(200).json({ isSaved: false });
+      }
+    }
+  });
+}
+
+exports.getDonationHistory = async (req, res) => {
+  const userId = res.locals.user.user_id;
+
+  const getDonationHistoryQuery = `
+    SELECT Donations.*, Users.username AS donor_username
+    FROM Donations
+    INNER JOIN Users ON Donations.donor_user_id = Users.user_id
+    WHERE Donations.donor_user_id = ? OR Donations.recipient_user_id = ?;;
+  `;
+
+  pool.query(getDonationHistoryQuery, [userId, userId], (error, results) => {
+    if (error) {
+      console.error(error);
+      res.status(500).send("Internal Server Error");
+    } else {
+      res.status(200).json(results);
+    }
+  });
+
+};
 
 exports.saveArt = async (req, res) => {
   const { artworkId } = req.params;
