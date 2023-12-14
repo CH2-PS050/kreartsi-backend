@@ -1,4 +1,6 @@
 const pool = require("../database");
+const config = require("../config");
+const uploadImage = require("../helpers/uploadImage");
 
 // Get All Arts
 exports.getArts = async (req, res) => {
@@ -75,37 +77,50 @@ exports.getArtById = async (req, res) => {
 
 // Upload Art
 exports.uploadArt = async (req, res) => {
-  const { caption, imageUrl, categoryId } = req.body;
+  const { caption } = req.body;
+  const { file } = req;
   const userId = res.locals.user.user_id;
 
-  if (!caption || !imageUrl || !categoryId) {
-    return res.status(400).json({ message: "Please enter all fields" });
-  }
-
-  // PANGGIL MODEL ML BUAT DETECT CATEGORY
-  const newArtQuery =
-    "INSERT INTO Artworks (caption, image_url, category_id, user_id) VALUES (?, ?, ?, ?)";
-  pool.query(
-    newArtQuery,
-    [caption, imageUrl, categoryId, userId],
-    (error, results) => {
-      if (error) {
-        console.error(error);
-        return res.status(500).send("Internal Server Error");
-      } else {
-        let response = {
-          id: results.insertId,
-          caption: caption,
-          imageUrl: imageUrl,
-          categoryId: categoryId,
-          userId: userId,
-        };
-        res
-          .status(200)
-          .json({ message: "Artwork uploaded successfully", art: response });
-      }
+  try {
+    if (!file || !caption) {
+      return res.status(400).json({
+        message: "Please upload an image and enter all required fields",
+      });
     }
-  );
+
+    const fileName = `art_${Date.now()}.jpg`;
+    const bucketName = config.storage.bucketName;
+    const categoryId = 3;
+    const imageUrl = await uploadImage(file.buffer, fileName, bucketName);
+
+    const newArtQuery =
+      "INSERT INTO Artworks (caption, image_url, category_id, user_id) VALUES (?, ?, ?, ?)";
+
+    pool.query(
+      newArtQuery,
+      [caption, imageUrl, categoryId, userId],
+      (error, results) => {
+        if (error) {
+          console.error(error);
+          return res.status(500).send("Internal Server Error");
+        } else {
+          let response = {
+            id: results.insertId,
+            caption: caption,
+            imageUrl: imageUrl,
+            categoryId: categoryId,
+            userId: userId,
+          };
+          res
+            .status(200)
+            .json({ message: "Artwork uploaded successfully", art: response });
+        }
+      }
+    );
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Internal Server Error");
+  }
 };
 
 // DONATE
@@ -216,7 +231,7 @@ exports.isLikedArt = async (req, res) => {
       }
     }
   });
-}
+};
 
 exports.unlikeArt = async (req, res) => {
   const { artworkId } = req.params;
@@ -251,7 +266,7 @@ exports.isSavedArt = async (req, res) => {
       }
     }
   });
-}
+};
 
 exports.getDonationHistory = async (req, res) => {
   const userId = res.locals.user.user_id;
@@ -271,7 +286,6 @@ exports.getDonationHistory = async (req, res) => {
       res.status(200).json(results);
     }
   });
-
 };
 
 exports.saveArt = async (req, res) => {

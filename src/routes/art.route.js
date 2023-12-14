@@ -1,4 +1,5 @@
 import { Router } from "express";
+import multer from "multer";
 import {
   getArts,
   getMyArts,
@@ -17,6 +18,9 @@ import {
   getMySavedArts,
 } from "../controllers/art.controller";
 
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
+
 const router = Router();
 
 router.get("/", getArts);
@@ -24,7 +28,7 @@ router.get("/my-arts", getMyArts);
 router.get("/my-saved-arts", getMySavedArts);
 router.get("/:artworkId", getArtById);
 
-router.post("/upload", uploadArt);
+router.post("/upload", upload.single("file"), uploadArt);
 router.delete("/:artworkId", deleteArt);
 router.put("/caption/:artworkId", editArtCaption);
 
