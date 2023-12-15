@@ -37,6 +37,27 @@ exports.getUserById = async (req, res) => {
   );
 };
 
+exports.getMyData = async (req, res) => {
+  const userId = res.locals.user.user_id;
+
+  pool.query(
+    "SELECT * FROM Users WHERE user_id = ?",
+    [userId],
+    (error, results) => {
+      if (error) {
+        console.error(error);
+        res.status(500).send("Internal Server Error");
+      } else {
+        if (results.length === 0) {
+          return res.status(400).json({ message: "User not found" });
+        } else {
+          res.status(200).json(results);
+        }
+      }
+    }
+  );
+};
+
 // Register User
 exports.registerUser = async (req, res) => {
   const { username, email, password } = req.body;
