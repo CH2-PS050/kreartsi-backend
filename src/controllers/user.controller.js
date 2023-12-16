@@ -5,14 +5,17 @@ const pool = require("../database");
 // sebenarnya will be better kalo pake sequelize ORM tp error wkt aku coba jd sementara query" gini aja dulu
 // Get All Users
 exports.getUsers = async (req, res) => {
-  pool.query("SELECT * FROM Users", (error, results) => {
-    if (error) {
-      console.error(error);
-      res.status(500).send("Internal Server Error");
-    } else {
-      res.json(results);
+  pool.query(
+    "SELECT user_id, username, email, coins FROM Users",
+    (error, results) => {
+      if (error) {
+        console.error(error);
+        res.status(500).send("Internal Server Error");
+      } else {
+        res.json(results);
+      }
     }
-  });
+  );
 };
 
 // Get User by ID
@@ -20,7 +23,7 @@ exports.getUserById = async (req, res) => {
   const { userId } = req.params;
 
   pool.query(
-    "SELECT * FROM Users WHERE user_id = ?",
+    "SELECT user_id, username, email, coins FROM Users WHERE user_id = ?",
     [userId],
     (error, results) => {
       if (error) {
@@ -39,9 +42,11 @@ exports.getUserById = async (req, res) => {
 
 exports.getMyData = async (req, res) => {
   const userId = res.locals.user.user_id;
+  console.log(userId);
+  console.log("tes");
 
   pool.query(
-    "SELECT * FROM Users WHERE user_id = ?",
+    "SELECT user_id, username, email, coins FROM Users WHERE user_id = ?",
     [userId],
     (error, results) => {
       if (error) {

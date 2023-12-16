@@ -15,7 +15,7 @@ router.post("/register", registerUser);
 router.post("/login", loginUser);
 
 router.use(authentication);
-router.get("/:userId", getUserById);
 router.get("/my-data", getMyData);
+router.get("/:userId", getUserById);
 
 export { router as userRouter };
