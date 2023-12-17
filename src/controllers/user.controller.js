@@ -1,8 +1,9 @@
 const { hashPassword, comparePassword } = require("../helpers/bcrypt");
 const { generateToken } = require("../helpers/jwt");
+const uploadImage = require("../helpers/uploadImage");
+const config = require("../config");
 const pool = require("../database");
 
-// sebenarnya will be better kalo pake sequelize ORM tp error wkt aku coba jd sementara query" gini aja dulu
 // Get All Users
 exports.getUsers = async (req, res) => {
   pool.query(
@@ -149,3 +150,35 @@ exports.loginUser = async (req, res) => {
     }
   );
 };
+
+// Edit Profile Picture
+exports.editProfilePicture = async (req, res) => {
+  const userId = res.locals.user.user_id;
+  const { file } = req;
+
+  try {
+    if (!file) {
+      return res.status(400).json({ message: "Please upload a profile image" });
+    }
+
+    const fileName = `profile_${userId}.jpg`;
+    const bucketName = config.storage.bucketName;
+    const imageUrl = await uploadImage(file.buffer, fileName, bucketName);
+
+    pool.query(
+      "UPDATE Users SET profilepic_url = ? WHERE user_id = ?",
+      [imageUrl, userId],
+      (error, results) => {
+        if (error) {
+          console.error(error);
+          res.status(500).send("Internal Server Error");
+        } else {
+          res.status(200).json({ message: "Profile picture updated" });
+        }
+      }
+    );
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Internal Server Error");
+  }
+}
