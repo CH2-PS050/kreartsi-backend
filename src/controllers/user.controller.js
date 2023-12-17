@@ -7,7 +7,7 @@ const pool = require("../database");
 // Get All Users
 exports.getUsers = async (req, res) => {
   pool.query(
-    "SELECT user_id, username, email, coins FROM Users",
+    "SELECT user_id, username, email, coins, profilepic_url FROM Users",
     (error, results) => {
       if (error) {
         console.error(error);
@@ -24,7 +24,7 @@ exports.getUserById = async (req, res) => {
   const { userId } = req.params;
 
   pool.query(
-    "SELECT user_id, username, email, coins FROM Users WHERE user_id = ?",
+    "SELECT user_id, username, email, coins, profilepic_url FROM Users WHERE user_id = ?",
     [userId],
     (error, results) => {
       if (error) {
@@ -47,7 +47,7 @@ exports.getMyData = async (req, res) => {
   console.log("tes");
 
   pool.query(
-    "SELECT user_id, username, email, coins FROM Users WHERE user_id = ?",
+    "SELECT user_id, username, email, coins, profilepic_url FROM Users WHERE user_id = ?",
     [userId],
     (error, results) => {
       if (error) {
