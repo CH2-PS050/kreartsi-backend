@@ -3,10 +3,10 @@ const { Storage } = require("@google-cloud/storage");
 
 const storage = new Storage({
   projectId: config.storage.projectId,
-  keyFilename: Buffer.from(config.storage.keyFileContent, "base64").toString(
-    "utf-8"
-  ),
-  // keyFilename: config.storage.keyFilename,
+  // keyFilename: Buffer.from(config.storage.keyFileContent, "base64").toString(
+  //   "utf-8"
+  // ),
+  keyFilename: config.storage.keyFilename,
 });
 
 const getBucket = (bucketName) => {
