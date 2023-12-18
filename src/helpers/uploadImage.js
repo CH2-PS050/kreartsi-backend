@@ -3,7 +3,7 @@ const { Storage } = require("@google-cloud/storage");
 
 const storage = new Storage({
   projectId: config.storage.projectId,
-  keyFilename: Buffer.from(process.env.GCS_KEY_FILE_CONTENT, "base64").toString(
+  keyFilename: Buffer.from(config.storage.keyFileContent, "base64").toString(
     "utf-8"
   ),
   // keyFilename: config.storage.keyFilename,
