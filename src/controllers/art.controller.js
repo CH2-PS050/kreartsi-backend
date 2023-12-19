@@ -4,7 +4,12 @@ const uploadImage = require("../helpers/uploadImage");
 
 // Get All Arts
 exports.getArts = async (req, res) => {
-  pool.query("SELECT * FROM Artworks", (error, results) => {
+  const isNewest = req.query.newest === undefined ? true : JSON.parse(req.query.newest);
+  const sortOrder = isNewest ? "DESC" : "ASC";
+
+  const getArtQuery = `SELECT * FROM Artworks ORDER BY upload_date %{sortOrder}`;
+
+  pool.query(getArtQuery,[sortOrder], (error, results) => {
     if (error) {
       console.error(error);
       res.status(500).send("Internal Server Error");
@@ -129,7 +134,7 @@ exports.donation = async (req, res) => {
   const recipientUserId = req.params.userId;
   const donorUserId = res.locals.user.user_id;
 
-  if (!donated_amount) {
+  if (!donatedAmount) {
     return res.status(400).json({ message: "Please input the amount" });
   }
 
