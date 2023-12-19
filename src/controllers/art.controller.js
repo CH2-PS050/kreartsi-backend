@@ -4,12 +4,19 @@ const uploadImage = require("../helpers/uploadImage");
 
 // Get All Arts
 exports.getArts = async (req, res) => {
-  const isNewest = req.query.newest === undefined ? true : JSON.parse(req.query.newest);
-  const sortOrder = isNewest ? "DESC" : "ASC";
+  // sort by newest or oldest based on the query parameter
+  const { newest } = req.query;
 
-  const getArtQuery = `SELECT * FROM Artworks ORDER BY upload_date %{sortOrder}`;
+  let sortQuery = "";
+  if (newest === "true") {
+    sortQuery = "ORDER BY upload_date ASC";
+  } else if (newest === "false") {
+    sortQuery = "ORDER BY upload_date DESC";
+  }
 
-  pool.query(getArtQuery,[sortOrder], (error, results) => {
+  const getArtQuery = `SELECT * FROM Artworks ${sortQuery}`;
+
+  pool.query(getArtQuery, (error, results) => {
     if (error) {
       console.error(error);
       res.status(500).send("Internal Server Error");
