@@ -141,7 +141,7 @@ exports.loginUser = async (req, res) => {
         res.status(200).json({
           token,
           user: {
-            id: results[0].id,
+            id: results[0].user_id,
             email: results[0].email,
             username: results[0].username,
           },
@@ -181,4 +181,4 @@ exports.editProfilePicture = async (req, res) => {
     console.error(error);
     res.status(500).send("Internal Server Error");
   }
-}
+};
