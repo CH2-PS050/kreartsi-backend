@@ -209,3 +209,20 @@ exports.searchUsers = async (req, res) => {
     }
   });
 };
+
+exports.getUserArtsById = async (req, res) => {
+  const { userId } = req.params;
+
+  pool.query(
+    "SELECT * FROM Artworks WHERE user_id = ?",
+    [userId],
+    (error, results) => {
+      if (error) {
+        console.error(error);
+        res.status(500).send("Internal Server Error");
+      } else {
+        res.status(200).json(results);
+      }
+    }
+  );
+};

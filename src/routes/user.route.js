@@ -9,6 +9,7 @@ import {
   getMyData,
   editProfilePicture,
   searchUsers,
+  getUserArtsById,
 } from "../controllers/user.controller";
 
 const storage = multer.memoryStorage();
@@ -25,5 +26,6 @@ router.get("/my-data", getMyData);
 router.put("/editprofile", upload.single("file"), editProfilePicture);
 router.get("/search", searchUsers);
 router.get("/:userId", getUserById);
+router.get("/:userId/arts", getUserArtsById);
 
 export { router as userRouter };
