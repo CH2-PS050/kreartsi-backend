@@ -100,7 +100,7 @@ exports.uploadArt = async (req, res) => {
       });
     }
 
-    const fileName = `art_${Date.now()}.jpg`;
+    const fileName = `art_${userId}_${Date.now()}.jpg`;
     const bucketName = config.storage.bucketName;
     const categoryId = 3;
     const imageUrl = await uploadImage(file.buffer, fileName, bucketName);

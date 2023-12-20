@@ -161,7 +161,7 @@ exports.editProfilePicture = async (req, res) => {
       return res.status(400).json({ message: "Please upload a profile image" });
     }
 
-    const fileName = `profile_${userId}.jpg`;
+    const fileName = `profile_${userId}_${Date.now()}.jpg`;
     const bucketName = config.storage.bucketName;
     const imageUrl = await uploadImage(file.buffer, fileName, bucketName);
 
@@ -173,7 +173,7 @@ exports.editProfilePicture = async (req, res) => {
           console.error(error);
           res.status(500).send("Internal Server Error");
         } else {
-          res.status(200).json({ message: "Profile picture updated" });
+          res.status(200).json({ message: "Profile picture updated", newProfpic: imageUrl });
         }
       }
     );
@@ -181,4 +181,29 @@ exports.editProfilePicture = async (req, res) => {
     console.error(error);
     res.status(500).send("Internal Server Error");
   }
+};
+
+// Search users by username
+exports.searchUsers = async (req, res) => {
+  const { searchTerm } = req.query;
+
+  if (!searchTerm) {
+    return res.status(400).json({ error: "Search term is required" });
+  }
+
+  const searchUsersQuery = `
+    SELECT username, user_id
+    FROM Users
+    WHERE username LIKE ?;
+  `;
+
+  const searchValue = `%${searchTerm}%`;
+  pool.query(searchUsersQuery, [searchValue], (error, results) => {
+    if (error) {
+      console.error(error);
+      res.status(500).send("Internal Server Error");
+    } else {
+      res.json(results);
+    }
+  });
 };
