@@ -173,7 +173,9 @@ exports.editProfilePicture = async (req, res) => {
           console.error(error);
           res.status(500).send("Internal Server Error");
         } else {
-          res.status(200).json({ message: "Profile picture updated", newProfpic: imageUrl });
+          res
+            .status(200)
+            .json({ message: "Profile picture updated", newProfpic: imageUrl });
         }
       }
     );
@@ -192,7 +194,7 @@ exports.searchUsers = async (req, res) => {
   }
 
   const searchUsersQuery = `
-    SELECT username, user_id
+    SELECT username, user_id, profilepic_url
     FROM Users
     WHERE username LIKE ?;
   `;
