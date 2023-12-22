@@ -6,9 +6,9 @@ const pool = mysql.createPool({
   user: config.database.user,
   password: config.database.password,
   database: config.database.database,
-  // host: config.database.host,
-  // port: config.database.port,
-  socketPath: config.database.host,
+  host: config.database.host,
+  port: config.database.port,
+  // socketPath: config.database.host,
 });
 
 pool.getConnection((error, connection) => {
