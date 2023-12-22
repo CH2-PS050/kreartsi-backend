@@ -23,8 +23,9 @@ https://documenter.getpostman.com/view/30206833/2s9Ykraevi
 
 ### To run backend locally, you need to have credentials (key.json) and env
 ```
-git clone https://github.com/louisyeee/Algeo02-20063.git
+git clone https://github.com/CH2-PS050/kreartsi-backend.git
 ```
+Go to dev branch
 ```
 npm install
 ```
