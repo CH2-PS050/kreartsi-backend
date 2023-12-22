@@ -43,8 +43,6 @@ exports.getUserById = async (req, res) => {
 
 exports.getMyData = async (req, res) => {
   const userId = res.locals.user.user_id;
-  console.log(userId);
-  console.log("tes");
 
   pool.query(
     "SELECT user_id, username, email, coins, profilepic_url FROM Users WHERE user_id = ?",
@@ -68,14 +66,12 @@ exports.getMyData = async (req, res) => {
 exports.registerUser = async (req, res) => {
   const { username, email, password } = req.body;
 
-  console.log(username, email, password);
   if (!username || !email || !password) {
     return res.status(400).json({ message: "Please enter all fields" });
   }
 
   const existingUserQuery = "SELECT * FROM Users WHERE email = ?";
   pool.query(existingUserQuery, [email], (error, results) => {
-    console.log(results);
     if (results.length > 0) {
       return res.status(400).json({ message: "User already exists" });
     } else if (error) {

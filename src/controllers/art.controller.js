@@ -255,7 +255,7 @@ exports.unlikeArt = async (req, res) => {
       console.error(error);
       return res.status(500).send("Internal Server Error");
     } else {
-      const deleteLikedArtQuery = 
+      const deleteLikedArtQuery =
         "DELETE FROM LikedArtworks WHERE artwork_id = ?";
       pool.query(deleteLikedArtQuery, [artworkId], (unlikeError) => {
         if (unlikeError) {
@@ -411,7 +411,7 @@ exports.deleteArt = async (req, res) => {
 
   const checkArtworkQuery =
     "SELECT * FROM Artworks WHERE user_id = ? AND artwork_id = ?";
-  console.log(checkArtworkQuery);
+
   pool.query(
     checkArtworkQuery,
     [userId, artworkId],
@@ -420,8 +420,6 @@ exports.deleteArt = async (req, res) => {
         console.error(checkError);
         return res.status(500).send("Internal Server Error");
       }
-
-      console.log(checkResults);
 
       if (checkResults.length === 0) {
         return res
