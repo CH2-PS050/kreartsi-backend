@@ -4,7 +4,19 @@ const uploadImage = require("../helpers/uploadImage");
 
 // Get All Arts
 exports.getArts = async (req, res) => {
-  pool.query("SELECT * FROM Artworks", (error, results) => {
+  // sort by newest or oldest based on the query parameter
+  const { newest } = req.query;
+
+  let sortQuery = "";
+  if (newest === "true") {
+    sortQuery = "ORDER BY upload_date ASC";
+  } else if (newest === "false") {
+    sortQuery = "ORDER BY upload_date DESC";
+  }
+
+  const getArtQuery = `SELECT * FROM Artworks ${sortQuery}`;
+
+  pool.query(getArtQuery, (error, results) => {
     if (error) {
       console.error(error);
       res.status(500).send("Internal Server Error");
@@ -88,7 +100,7 @@ exports.uploadArt = async (req, res) => {
       });
     }
 
-    const fileName = `art_${Date.now()}.jpg`;
+    const fileName = `art_${userId}_${Date.now()}.jpg`;
     const bucketName = config.storage.bucketName;
     const categoryId = 3;
     const imageUrl = await uploadImage(file.buffer, fileName, bucketName);
@@ -129,7 +141,7 @@ exports.donation = async (req, res) => {
   const recipientUserId = req.params.userId;
   const donorUserId = res.locals.user.user_id;
 
-  if (!donated_amount) {
+  if (!donatedAmount) {
     return res.status(400).json({ message: "Please input the amount" });
   }
 
@@ -243,7 +255,7 @@ exports.unlikeArt = async (req, res) => {
       console.error(error);
       return res.status(500).send("Internal Server Error");
     } else {
-      const deleteLikedArtQuery = 
+      const deleteLikedArtQuery =
         "DELETE FROM LikedArtworks WHERE artwork_id = ?";
       pool.query(deleteLikedArtQuery, [artworkId], (unlikeError) => {
         if (unlikeError) {
@@ -399,7 +411,7 @@ exports.deleteArt = async (req, res) => {
 
   const checkArtworkQuery =
     "SELECT * FROM Artworks WHERE user_id = ? AND artwork_id = ?";
-  console.log(checkArtworkQuery);
+
   pool.query(
     checkArtworkQuery,
     [userId, artworkId],
@@ -408,8 +420,6 @@ exports.deleteArt = async (req, res) => {
         console.error(checkError);
         return res.status(500).send("Internal Server Error");
       }
-
-      console.log(checkResults);
 
       if (checkResults.length === 0) {
         return res

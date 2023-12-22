@@ -43,8 +43,6 @@ exports.getUserById = async (req, res) => {
 
 exports.getMyData = async (req, res) => {
   const userId = res.locals.user.user_id;
-  console.log(userId);
-  console.log("tes");
 
   pool.query(
     "SELECT user_id, username, email, coins, profilepic_url FROM Users WHERE user_id = ?",
@@ -68,14 +66,12 @@ exports.getMyData = async (req, res) => {
 exports.registerUser = async (req, res) => {
   const { username, email, password } = req.body;
 
-  console.log(username, email, password);
   if (!username || !email || !password) {
     return res.status(400).json({ message: "Please enter all fields" });
   }
 
   const existingUserQuery = "SELECT * FROM Users WHERE email = ?";
   pool.query(existingUserQuery, [email], (error, results) => {
-    console.log(results);
     if (results.length > 0) {
       return res.status(400).json({ message: "User already exists" });
     } else if (error) {
@@ -141,7 +137,7 @@ exports.loginUser = async (req, res) => {
         res.status(200).json({
           token,
           user: {
-            id: results[0].id,
+            id: results[0].user_id,
             email: results[0].email,
             username: results[0].username,
           },
@@ -161,7 +157,7 @@ exports.editProfilePicture = async (req, res) => {
       return res.status(400).json({ message: "Please upload a profile image" });
     }
 
-    const fileName = `profile_${userId}.jpg`;
+    const fileName = `profile_${userId}_${Date.now()}.jpg`;
     const bucketName = config.storage.bucketName;
     const imageUrl = await uploadImage(file.buffer, fileName, bucketName);
 
@@ -173,7 +169,9 @@ exports.editProfilePicture = async (req, res) => {
           console.error(error);
           res.status(500).send("Internal Server Error");
         } else {
-          res.status(200).json({ message: "Profile picture updated" });
+          res
+            .status(200)
+            .json({ message: "Profile picture updated", newProfpic: imageUrl });
         }
       }
     );
@@ -181,4 +179,46 @@ exports.editProfilePicture = async (req, res) => {
     console.error(error);
     res.status(500).send("Internal Server Error");
   }
-}
+};
+
+// Search users by username
+exports.searchUsers = async (req, res) => {
+  const { searchTerm } = req.query;
+
+  if (!searchTerm) {
+    return res.status(400).json({ error: "Search term is required" });
+  }
+
+  const searchUsersQuery = `
+    SELECT username, user_id, profilepic_url
+    FROM Users
+    WHERE username LIKE ?;
+  `;
+
+  const searchValue = `%${searchTerm}%`;
+  pool.query(searchUsersQuery, [searchValue], (error, results) => {
+    if (error) {
+      console.error(error);
+      res.status(500).send("Internal Server Error");
+    } else {
+      res.json(results);
+    }
+  });
+};
+
+exports.getUserArtsById = async (req, res) => {
+  const { userId } = req.params;
+
+  pool.query(
+    "SELECT * FROM Artworks WHERE user_id = ?",
+    [userId],
+    (error, results) => {
+      if (error) {
+        console.error(error);
+        res.status(500).send("Internal Server Error");
+      } else {
+        res.status(200).json(results);
+      }
+    }
+  );
+};
